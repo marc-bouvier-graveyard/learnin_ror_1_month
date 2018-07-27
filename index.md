@@ -10,6 +10,8 @@ Tour of the framework
 
 * [The rails Doctrine](https://rubyonrails.org/doctrine/)
 
+[tag 2018-07-25](https://github.com/marc-bouvier/learnin_ror_1_month/tree/2018-07-25)
+
 ## 2018-07-26
 Todo Next : explicit why I want to learn ruby on rails and what I want to do with it.
 ### What do I want? 
@@ -59,6 +61,8 @@ bin/rails server
 ```
 
 The site can be found at [http://localhost:3000](http://localhost:3000).
+
+[tag 2018-07-26](https://github.com/marc-bouvier/learnin_ror_1_month/tree/2018-07-26)
 
 ## 2018-07-27
 
