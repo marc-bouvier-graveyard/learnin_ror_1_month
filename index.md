@@ -59,3 +59,118 @@ bin/rails server
 ```
 
 The site can be found at [http://localhost:3000](http://localhost:3000).
+
+## 2018-07-27
+
+Continuing blog tuto...
+
+Generate a controller called "Welcome" with an action "index"
+```
+> bin/rails generate controller Welcome index
+Running via Spring preloader in process 9031
+      create  app/controllers/welcome_controller.rb
+       route  get 'welcome/index'
+      invoke  erb
+      create    app/views/welcome
+      create    app/views/welcome/index.html.erb
+      invoke  test_unit
+      create    test/controllers/welcome_controller_test.rb
+      invoke  helper
+      create    app/helpers/welcome_helper.rb
+      invoke    test_unit
+      invoke  assets
+      invoke    coffee
+      create      app/assets/javascripts/welcome.coffee
+      invoke    scss
+      create      app/assets/stylesheets/welcome.scss
+```
+
+Define where the home page is located in the router (`config/routes.rb`)
+
+```ruby
+   root 'welcome#index'
+```
+
+Add ressource "articles" in routes. It represents a shared resource with CRUD operations.
+
+```ruby
+  resources :articles
+```
+
+To list routes
+```
+> bin/rails routes
+                   Prefix Verb   URI Pattern         Controller#Action
+            welcome_index GET    /welcome/index(.:format)         welcome#index
+                 articles GET    /articles(.:format)         articles#index
+                          POST   /articles(.:format)         articles#create
+              new_article GET    /articles/new(.:format)         articles#new
+             edit_article GET    /articles/:id/edit(.:format)         articles#edit
+                  article GET    /articles/:id(.:format)         articles#show
+                          PATCH  /articles/:id(.:format)         articles#update
+                          PUT    /articles/:id(.:format)         articles#update
+                          DELETE /articles/:id(.:format)         articles#destroy
+                     root GET    /         welcome#index
+       rails_service_blob GET    /rails/active_storage/blobs/:signed_id/*filename(.:format)         active_storage/blobs#show
+rails_blob_representation GET    /rails/active_storage/representations/:signed_blob_id/:variation_key/*filename(.:format) active_storage/representations#show
+       rails_disk_service GET    /rails/active_storage/disk/:encoded_key/*filename(.:format)         active_storage/disk#show
+update_rails_disk_service PUT    /rails/active_storage/disk/:encoded_token(.:format)         active_storage/disk#update
+     rails_direct_uploads POST   /rails/active_storage/direct_uploads(.:format)         active_storage/direct_uploads#create
+```
+
+Generate controller associated with the route.
+```
+> bin/rails generate controller Articles
+Running via Spring preloader in process 10816      create  app/controllers/articles_controller.rb
+      invoke  erb      create    app/views/articles
+      invoke  test_unit      create    test/controllers/articles_controller_test.rb
+      invoke  helper      create    app/helpers/articles_helper.rb
+      invoke    test_unit      invoke  assets
+      invoke    coffee      create      app/assets/javascripts/articles.coffee
+      invoke    scss
+      create      app/assets/stylesheets/articles.scss
+```
+
+Browse to `http://localhost:3000/articles/new`
+
+> Unknown action
+> The action 'new' could not be found for ArticlesController
+
+In `app/controllers/articles_controller.rb` add `new` public method.
+```ruby
+class ArticlesController < ApplicationController
+  def new
+  end
+end
+```
+
+Refresh the page and you will se a new error
+
+> ActionController::UnknownFormat in ArticlesController#new
+
+We need to associate a view to the action.
+
+Create the missing template `app/views/articles/new.html.erb`
+
+Refresh http://localhost:3000/articles/new
+
+The content is visible.
+
+Edit the template and create a form using the form builder.
+```
+<%= form_with scope: :article, local: true do |form| %>
+  <p>
+    <%= form.label :title %><br>
+    <%= form.text_field :title %>
+  </p>
+ 
+  <p>
+    <%= form.label :text %><br>
+    <%= form.text_area :text %>
+  </p>
+ 
+  <p>
+    <%= form.submit %>
+  </p>
+<% end %>
+```
