@@ -178,3 +178,18 @@ Edit the template and create a form using the form builder.
   </p>
 <% end %>
 ```
+Problem, the submits points to the same page. Let's change it.
+```
+  <%= form_with scope: :article, url: articles_path, local: true do |form| %>
+```
+
+Now, fill the form and submit.
+
+> Unknown action
+> The action 'create' could not be found for ArticlesController
+
+See you next time ! https://guides.rubyonrails.org/getting_started.html#creating-articles
+
+[tag 2018-07-27](https://github.com/marc-bouvier/learnin_ror_1_month/tree/2018-07-27)
+
+## ????-??-??
