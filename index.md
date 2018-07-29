@@ -193,3 +193,7 @@ See you next time ! https://guides.rubyonrails.org/getting_started.html#creating
 [tag 2018-07-27](https://github.com/marc-bouvier/learnin_ror_1_month/tree/2018-07-27)
 
 ## ????-??-??
+
+Goals : Why I want to learn ROR?
+> I often have good ideas but I just stash them into notepads or trello and never begin to implement them
+> ROR I think can help me prototype these ideas and show them to people that may be interested
