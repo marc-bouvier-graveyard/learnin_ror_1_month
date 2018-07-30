@@ -188,12 +188,170 @@ Now, fill the form and submit.
 > Unknown action
 > The action 'create' could not be found for ArticlesController
 
-See you next time ! https://guides.rubyonrails.org/getting_started.html#creating-articles
+See you next time ! 
 
 [tag 2018-07-27](https://github.com/marc-bouvier/learnin_ror_1_month/tree/2018-07-27)
 
-## ????-??-??
+## 2018-07-30
 
 Goals : Why I want to learn ROR?
 > I often have good ideas but I just stash them into notepads or trello and never begin to implement them
 > ROR I think can help me prototype these ideas and show them to people that may be interested
+
+Add "create" action in articles controller.
+```
+  def create
+    render plain: params[:article].inspect
+  end
+```
+
+`params` method allow to extract parameters from request.
+
+Now let's create the model for articles. It will generate classes and migration script for a table.
+
+```
+> bin/rails generate model Article title:string text:text  
+Running via Spring preloader in process 16005
+    invoke  active_record
+    create    db/migrate/20180730055636_create_articles.rb
+    create    app/models/article.rb
+    invoke    test_unit
+    create      test/models/article_test.rb
+    create      test/fixtures/articles.yml
+```
+
+You can now run the migration script.
+
+```
+> bin/rails db:migrate
+== 20180730055636 CreateArticles: migrating ===================================
+-- create_table(:articles)
+   -> 0.0012s
+== 20180730055636 CreateArticles: migrated (0.0013s) ==========================
+```
+
+Back in the articles controller we can now update the create action.
+```
+  def create
+    @article = Article.new(params[:article])
+
+    @article.save
+    redirect_to @article
+  end
+```
+
+Try to create an arcticle http://localhost:3000/articles/new
+
+> ActiveModel::ForbiddenAttributesError in ArticlesController#create
+> ActiveModel::ForbiddenAttributesError
+> Extracted source (around line #6):
+> ```
+>   def create
+>     @article = Article.new(params[:article])
+>    
+>     @article.save
+>     redirect_to @article
+> ```
+> 
+> Rails.root: /home/marco/learning/ruby_on_rails/learnin_ror_1_month/blog
+
+A security feature called [strong parameters](https://guides.rubyonrails.org/action_controller_overview.html#strong-parameters) don't allow to map directly any values of parameters into the model. This is to avoid malicious parameter injection. We have to specify exactly which parameters are allowed.
+
+We know we will wat to reuse the algorithm in the update action so we factor it in a private method.
+
+```
+  def create
+    @article = Article.new(article_params)
+   
+    @article.save
+    redirect_to @article
+  end
+   
+  private
+    def article_params
+      params.require(:article).permit(:title, :text)
+    end
+```
+
+Write show method
+
+```
+  def show
+    @article = Article.find(params[:id])
+  end
+```
+
+@article is an instance variable and all instances variables will be passed to the view.
+
+Create "show" view `app/views/articles/show.html.erb`
+
+```
+<p>
+  <strong>Title:</strong>
+  <%= @article.title %>
+</p>
+ 
+<p>
+  <strong>Text:</strong>
+  <%= @article.text %>
+</p>
+```
+
+Now we want to list article. We can find action name for ̀`articles` using `bin/rails route`.
+```
+> bin/rails routes
+...
+  articles GET    /articles(.:format) articles#index
+...
+```
+
+We then now that we need a template for the action `index`
+```
+  def index
+    @articles = Article.all
+  end
+```
+
+app/views/articles/index.html.erb
+```
+
+<h1>Listing articles</h1>
+ 
+<table>
+  <tr>
+    <th>Title</th>
+    <th>Text</th>
+    <th></th>
+  </tr>
+ 
+  <% @articles.each do |article| %>
+    <tr>
+      <td><%= article.title %></td>
+      <td><%= article.text %></td>
+      <td><%= link_to 'Show', article_path(article) %></td>
+    </tr>
+  <% end %>
+</table>
+```
+
+We can now find the articles here : http://localhost:3000/articles
+
+Let's add links in various pages for navigation.
+
+Open app/views/welcome/index.html.erb
+```
+<h1>Hello, Rails!</h1>
+<%= link_to 'My Blog', controller: 'articles' %>
+```
+app/views/articles/new.html.erb
+```
+  <%= link_to 'Back', articles_path %>
+```
+app/views/articles/index.html.erb
+```
+  <%= link_to 'New', new_articles_path %>
+```
+
+Let's stop here for now https://guides.rubyonrails.org/getting_started.html#adding-some-validation
+
+## ????-??-??
