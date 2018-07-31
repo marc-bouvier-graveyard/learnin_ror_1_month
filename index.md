@@ -354,4 +354,195 @@ app/views/articles/index.html.erb
 
 Let's stop here for now https://guides.rubyonrails.org/getting_started.html#adding-some-validation
 
-## ????-??-??
+[tag 2018-07-30](https://github.com/marc-bouvier/learnin_ror_1_month/tree/2018-07-30)
+
+## 2018-07-31
+
+Installing debugger and formatter for ruby. 
+```
+sudo gem install rubocop
+sudo gem install ruby-debug-ide -v 0.6.0
+sudo gem install debase -v 0.2.2
+sudo gem install rcodetools
+```
+
+Configure vs code
+> Install ruby extension : rebornix.ruby
+> Configure vscode settings
+> ```
+>    "ruby.codeCompletion": "rcodetools",
+>    "ruby.format": "rubocop",
+>    "ruby.intellisense": "rubyLocate"
+> ```
+
+In the model file we can add validation : `app/models/article.rb`
+
+```
+  validates :title, presence: true,
+                    length: { minimum: 5 }
+```
+If the validation is incorrect `Article.save()` will return false. Let's handle this case in the controller.
+
+If save returns false, we redirect to the form.
+`app/controllers/articles_controller.rb`
+```ruby
+
+def new
+  @article = Article.new
+end
+ 
+def create
+  @article = Article.new(article_params)
+ 
+  if @article.save
+    redirect_to @article
+  else
+    render 'new'
+  end
+end
+ 
+private
+  def article_params
+    params.require(:article).permit(:title, :text)
+  end
+```
+
+We use `render` instead of `redirect_to` when save returns `false`. The ̀ render` method is used so that the `@article` object is passed back to the new template when it is rendered. 
+
+Now we just give back the form without more information. Let's provide error messageto let know the user something wrong happened.
+
+```html
+<%= form_with scope: :article, url: articles_path, local: true do |form| %>
+ 
+  <% if @article.errors.any? %>
+    <div id="error_explanation">
+      <h2>
+        <%= pluralize(@article.errors.count, "error") %> prohibited
+        this article from being saved:
+      </h2>
+      <ul>
+        <% @article.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+ 
+  <p>
+    <%= form.label :title %><br>
+    <%= form.text_field :title %>
+  </p>
+ 
+  <p>
+    <%= form.label :text %><br>
+    <%= form.text_area :text %>
+  </p>
+ 
+  <p>
+    <%= form.submit %>
+  </p>
+ 
+<% end %>
+ 
+<%= link_to 'Back', articles_path %>
+```
+
+> Rails automatically wraps fields that contain an error with a div with class field_with_errors. You can define a css rule to make them standout.
+
+Lets update the article now.
+̀`articles_controller.rb`
+```ruby
+  def edit
+    @article = Article.find(params[:id])
+  end
+```
+
+Create a file `app/views/articles/edit.html.erb`
+```html
+<h1>Edit article</h1>
+ 
+<%= form_with(model: @article, local: true) do |form| %>
+ 
+  <% if @article.errors.any? %>
+    <div id="error_explanation">
+      <h2>
+        <%= pluralize(@article.errors.count, "error") %> prohibited
+        this article from being saved:
+      </h2>
+      <ul>
+        <% @article.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+ 
+  <p>
+    <%= form.label :title %><br>
+    <%= form.text_field :title %>
+  </p>
+ 
+  <p>
+    <%= form.label :text %><br>
+    <%= form.text_area :text %>
+  </p>
+ 
+  <p>
+    <%= form.submit %>
+  </p>
+ 
+<% end %>
+ 
+<%= link_to 'Back', articles_path %>
+```
+
+Add update action in the controller.
+
+```ruby
+  def edit
+    @article =  Article.find(params[:id])
+  end
+  
+  def update
+    @article = Article.find(params[:id])
+  
+    if @article.update(article_params)
+      redirect_to @article
+    else
+      render 'edit'
+    end
+  end
+```
+
+Add an edit link in the blog articles list
+```html
+  <table>
+    <tr>
+      <th>Title</th>
+      <th>Text</th>
+      <th colspan="2"></th>
+    </tr>
+  
+    <% @articles.each do |article| %>
+      <tr>
+        <td><%= article.title %></td>
+        <td><%= article.text %></td>
+        <td><%= link_to 'Show', article_path(article) %></td>
+        <td><%= link_to 'Edit', edit_article_path(article) %></td>
+      </tr>
+    <% end %>
+  </table>
+```
+
+And one to the show page
+
+```
+...
+
+  <%= link_to 'Edit', edit_article_path(@article) %> |
+  <%= link_to 'Back', articles_path %>
+```
+
+Next time [https://guides.rubyonrails.org/getting_started.html#using-partials-to-clean-up-duplication-in-views](https://guides.rubyonrails.org/getting_started.html#using-partials-to-clean-up-duplication-in-views)
+
+[tag 2018-07-31](https://github.com/marc-bouvier/learnin_ror_1_month/tree/2018-07-31)
