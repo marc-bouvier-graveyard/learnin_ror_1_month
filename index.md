@@ -614,3 +614,11 @@ The route is following `bin/rails routes`
   DELETE /articles/:id(.:format)      articles#destroy
 ```
 
+Add a destroy link in the index
+
+```
+<td><%= link_to 'Destroy', article_path(article),
+              method: :delete,
+              data: { confirm: 'Are you sure?' } %></td>
+```
+
