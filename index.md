@@ -607,3 +607,10 @@ app/views/articles/edit.html.erb
 
 Because Article is a resource corresponding to a full set of RESTful routes, 
 Rails is able to infer which route and URI to use.
+
+Now we can add the delete view and action.
+The route is following `bin/rails routes`
+```
+  DELETE /articles/:id(.:format)      articles#destroy
+```
+
