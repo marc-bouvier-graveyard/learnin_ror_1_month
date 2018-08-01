@@ -622,3 +622,6 @@ Add a destroy link in the index
               data: { confirm: 'Are you sure?' } %></td>
 ```
 
+Next time [https://guides.rubyonrails.org/getting_started.html#adding-a-second-model](https://guides.rubyonrails.org/getting_started.html#adding-a-second-model)
+
+[tag 2018-08-01](https://github.com/marc-bouvier/learnin_ror_1_month/tree/2018-08-01)
