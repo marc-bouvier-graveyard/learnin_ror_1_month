@@ -546,3 +546,64 @@ And one to the show page
 Next time [https://guides.rubyonrails.org/getting_started.html#using-partials-to-clean-up-duplication-in-views](https://guides.rubyonrails.org/getting_started.html#using-partials-to-clean-up-duplication-in-views)
 
 [tag 2018-07-31](https://github.com/marc-bouvier/learnin_ror_1_month/tree/2018-07-31)
+
+## 2018-08-01
+
+Code for showing article informations are similar in both `edit` and `new` pages. We can remove duplication using partial views which are prefixed with `_` by convention.
+
+app/views/articles/_form.html.erb
+```
+
+<%= form_with model: @article, local: true do |form| %>
+ 
+  <% if @article.errors.any? %>
+    <div id="error_explanation">
+      <h2>
+        <%= pluralize(@article.errors.count, "error") %> prohibited
+        this article from being saved:
+      </h2>
+      <ul>
+        <% @article.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+ 
+  <p>
+    <%= form.label :title %><br>
+    <%= form.text_field :title %>
+  </p>
+ 
+  <p>
+    <%= form.label :text %><br>
+    <%= form.text_area :text %>
+  </p>
+ 
+  <p>
+    <%= form.submit %>
+  </p>
+ 
+<% end %>
+```
+
+app/views/articles/new.html.erb
+```
+<h1>New article</h1>
+ 
+<%= render 'form' %>
+ 
+<%= link_to 'Back', articles_path %>
+```
+
+app/views/articles/edit.html.erb
+```
+<h1>Edit article</h1>
+ 
+<%= render 'form' %>
+ 
+<%= link_to 'Back', articles_path %>
+```
+
+Because Article is a resource corresponding to a full set of RESTful routes, 
+Rails is able to infer which route and URI to use.
