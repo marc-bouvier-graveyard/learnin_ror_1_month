@@ -625,3 +625,171 @@ Add a destroy link in the index
 Next time [https://guides.rubyonrails.org/getting_started.html#adding-a-second-model](https://guides.rubyonrails.org/getting_started.html#adding-a-second-model)
 
 [tag 2018-08-01](https://github.com/marc-bouvier/learnin_ror_1_month/tree/2018-08-01)
+
+## 2018-08-02
+
+Now we add comments to article. Let's setup this new model.
+
+```
+> bin/rails generate model Comment commenter:string body:text article:references
+Running via Spring preloader in process 6076
+      invoke  active_record
+      create    db/migrate/20180802062259_create_comments.rb
+      create    app/models/comment.rb
+      invoke    test_unit
+      create      test/models/comment_test.rb
+      create      test/fixtures/comments.yml
+```
+
+Run the migration script.
+The app/models/comment.rb
+```ruby
+class Comment < ApplicationRecord
+  belongs_to :article
+end
+```
+
+Let's also look at the migration script
+```ruby
+class CreateComments < ActiveRecord::Migration[5.0]
+  def change
+    create_table :comments do |t|
+      t.string :commenter
+      t.text :body
+      t.references :article, foreign_key: true
+ 
+      t.timestamps
+    end
+  end
+end
+```
+
+Run the migration
+```
+> bin/rails db:migrate
+  == 20180802062259 CreateComments: migrating ===================================
+  -- create_table(:comments)
+    -> 0.0045s
+  == 20180802062259 CreateComments: migrated (0.0046s) ==========================
+```
+
+Each comment relates to an article `app/models/comment.rb`
+```
+class Comment < ApplicationRecord
+  belongs_to :article
+end
+```
+
+We need to edit `app/models/article.rb` to specify tha an aticle can have multiple comments.
+```
+class Article < ApplicationRecord
+  has_many :comments
+  validates :title, presence: true,
+                    length: { minimum: 5 }
+end
+```
+
+We can this this access all the comments from an article like this `@article.comments` among other features.
+
+Let's add a route for the comments
+
+```ruby
+resources :articles do
+  resources :comments
+end
+```
+
+This is a nested route from articles.
+
+We can now generate a controller for comments.
+
+```
+> bin/rails generate controller Comments
+Running via Spring preloader in process 8126
+      create  app/controllers/comments_controller.rb
+      invoke  erb
+      create    app/views/comments
+      invoke  test_unit
+      create    test/controllers/comments_controller_test.rb
+      invoke  helper
+      create    app/helpers/comments_helper.rb
+      invoke    test_unit
+      invoke  assets
+      invoke    coffee
+      create      app/assets/javascripts/comments.coffee
+      invoke    scss
+      create      app/assets/stylesheets/comments.scss
+```
+
+Modify `app/views/articles/show.html.erb` to allow adding comments
+
+```html
+<p>
+  <strong>Title:</strong>
+  <%= @article.title %>
+</p>
+ 
+<p>
+  <strong>Text:</strong>
+  <%= @article.text %>
+</p>
+ 
+<h2>Add a comment:</h2>
+<%= form_with(model: [ @article, @article.comments.build ], local: true) do |form| %>
+  <p>
+    <%= form.label :commenter %><br>
+    <%= form.text_field :commenter %>
+  </p>
+  <p>
+    <%= form.label :body %><br>
+    <%= form.text_area :body %>
+  </p>
+  <p>
+    <%= form.submit %>
+  </p>
+<% end %>
+ 
+<%= link_to 'Edit', edit_article_path(@article) %> |
+<%= link_to 'Back', articles_path %>
+```
+
+In comment controller, add create action
+
+```
+
+class CommentsController < ApplicationController
+  def create
+    @article = Article.find(params[:article_id])
+    @comment = @article.comments.create(comment_params)
+    redirect_to article_path(@article)
+  end
+ 
+  private
+    def comment_params
+      params.require(:comment).permit(:commenter, :body)
+    end
+end
+```
+
+We will also add comments to article to see them once they are created.
+
+```
+<h2>Comments</h2>
+<% @article.comments.each do |comment| %>
+  <p>
+    <strong>Commenter:</strong>
+    <%= comment.commenter %>
+  </p>
+ 
+  <p>
+    <strong>Comment:</strong>
+    <%= comment.body %>
+  </p>
+<% end %>
+```
+
+Let's stop here for now
+
+[https://guides.rubyonrails.org/getting_started.html#refactoring](https://guides.rubyonrails.org/getting_started.html#refactoring)
+
+[tag 2018-08-02](https://github.com/marc-bouvier/learnin_ror_1_month/tree/2018-08-02)
