@@ -793,3 +793,102 @@ Let's stop here for now
 [https://guides.rubyonrails.org/getting_started.html#refactoring](https://guides.rubyonrails.org/getting_started.html#refactoring)
 
 [tag 2018-08-02](https://github.com/marc-bouvier/learnin_ror_1_month/tree/2018-08-02)
+
+## 2018-08_24
+
+We mak a partial in a separate file so we can reuse it in several places and limit the size of files.
+`app/views/comments/_comment.html.erb`
+
+```
+<p>
+  <strong>Commenter:</strong>
+  <%= comment.commenter %>
+</p>
+
+<p>
+  <strong>Comment:</strong>
+  <%= comment.body %>
+</p>
+```
+
+Change `app/views/articles/show.html.erb` to use the partial.
+
+```
+<p>
+  <strong>Title:</strong>
+  <%= @article.title %>
+</p>
+ 
+<p>
+  <strong>Text:</strong>
+  <%= @article.text %>
+</p>
+ 
+<h2>Comments</h2>
+<%= render @article.comments %>
+ 
+<h2>Add a comment:</h2>
+<%= form_with(model: [ @article, @article.comments.build ], local: true) do |form| %>
+  <p>
+    <%= form.label :commenter %><br>
+    <%= form.text_field :commenter %>
+  </p>
+  <p>
+    <%= form.label :body %><br>
+    <%= form.text_area :body %>
+  </p>
+  <p>
+    <%= form.submit %>
+  </p>
+<% end %>
+ 
+<%= link_to 'Edit', edit_article_path(@article) %> |
+<%= link_to 'Back', articles_path %>
+```
+
+Notice `<%= render @article.comments %>`. It will automatically by convention make that 
+`app/views/comments/_comment.html.erb` is used to render the comment view.
+
+Let's also move comment creation form in a partial : `app/views/comments/_form.html.erb`
+
+```
+<%= form_with(model: [ @article, @article.comments.build ], local: true) do |form| %>
+  <p>
+    <%= form.label :commenter %><br>
+    <%= form.text_field :commenter %>
+  </p>
+  <p>
+    <%= form.label :body %><br>
+    <%= form.text_area :body %>
+  </p>
+  <p>
+    <%= form.submit %>
+  </p>
+<% end %>
+```
+
+Modify `app/views/articles/show.html.erb` to use it
+```
+
+<p>
+  <strong>Title:</strong>
+  <%= @article.title %>
+</p>
+ 
+<p>
+  <strong>Text:</strong>
+  <%= @article.text %>
+</p>
+ 
+<h2>Comments</h2>
+<%= render @article.comments %>
+ 
+<h2>Add a comment:</h2>
+<%= render 'comments/form' %>
+ 
+<%= link_to 'Edit', edit_article_path(@article) %> |
+<%= link_to 'Back', articles_path %>
+```
+
+The same way, `<%= render 'comments/form' %>` will be rendered as the view for adding comment.
+
