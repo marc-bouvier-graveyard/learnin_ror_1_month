@@ -892,3 +892,39 @@ Modify `app/views/articles/show.html.erb` to use it
 
 The same way, `<%= render 'comments/form' %>` will be rendered as the view for adding comment.
 
+To finish we want to be able to delete comments.
+
+We add a delete link in the `app/views/comments/_comment.html.erb` partial.
+
+```
+<%= link_to 'Destroy Comment', [comment.article, comment],
+               method: :delete,
+               data: { confirm: 'Are you sure?' } %>
+</p>
+```
+
+Now add a destroy method in the comments controller
+```ruby
+  def destroy
+    @article = Article.find(params[:article_id])
+    @comment = @article.comments.find(params[:id])
+    @comment.destroy
+    redirect_to article_path(@article)
+  end
+```
+
+When you delete an article you wan to delete its comments also. Let's modify the model in order to do that.
+
+```ruby
+class Article < ApplicationRecord
+  has_many :comments, dependent: :destroy
+  validates :title, presence: true,
+                    length: { minimum: 5 }
+end
+```
+We just added `, dependent: :destroy` to comments.
+
+
+[https://guides.rubyonrails.org/getting_started.html#security](https://guides.rubyonrails.org/getting_started.html#security)
+
+[tag 2018-08-24](https://github.com/marc-bouvier/learnin_ror_1_month/tree/2018-08-24)
